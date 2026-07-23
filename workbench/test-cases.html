@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PredX QA 测试用例工作台</title>
+  <title>PredX QA Agent 工作台</title>
   <style>
     :root {
       --bg: #f5f7fb;
       --panel: #ffffff;
+      --panel-soft: #f8fafc;
       --line: #e5e7eb;
       --text: #111827;
       --muted: #64748b;
@@ -17,6 +18,7 @@
       --success: #16a34a;
       --warning: #d97706;
       --radius: 8px;
+      --shadow: 0 14px 40px rgb(15 23 42 / 8%);
     }
     * { box-sizing: border-box; }
     body {
@@ -32,7 +34,7 @@
     .app {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: 64px 288px minmax(0, 1fr);
+      grid-template-columns: 64px 288px minmax(0, 1fr) 340px;
     }
     .rail {
       background: #0f172a;
@@ -52,6 +54,9 @@
       cursor: pointer;
       font-size: 11px;
       font-weight: 700;
+    }
+    .rail-item:first-child {
+      margin-top: 4px;
     }
     .rail-item:hover,
     .rail-item.active {
@@ -163,6 +168,12 @@
       padding: 22px 24px 36px;
       overflow: auto;
     }
+    .agent-panel {
+      border-left: 1px solid var(--line);
+      background: #fff;
+      padding: 18px 16px;
+      overflow: auto;
+    }
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -180,6 +191,29 @@
       color: var(--muted);
       font-size: 13px;
     }
+    .stage-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .stage-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #dbeafe;
+      border-radius: 999px;
+      color: #1d4ed8;
+      background: #eff6ff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .stage-pill.current {
+      color: #ffffff;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
     .top-actions {
       display: flex;
       gap: 8px;
@@ -193,6 +227,66 @@
       padding: 0 10px;
       background: #fff;
       outline: none;
+    }
+    .workspace-panel {
+      display: none;
+    }
+    .workspace-panel.active {
+      display: block;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+    .panel-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .primary-action,
+    .ghost-action,
+    .command-card button,
+    .agent-card button {
+      min-height: 36px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .primary-action {
+      color: #fff;
+      background: var(--brand);
+    }
+    .ghost-action,
+    .command-card button,
+    .agent-card button {
+      color: #334155;
+      border-color: var(--line);
+      background: #fff;
+    }
+    .primary-action:hover,
+    .ghost-action:hover,
+    .command-card button:hover,
+    .agent-card button:hover {
+      filter: brightness(0.98);
+      border-color: #c7d2fe;
     }
     .summary-grid {
       display: grid;
@@ -218,6 +312,84 @@
       margin: 4px 0;
       font-size: 26px;
       line-height: 1;
+    }
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+    .workspace-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .flow-card,
+    .command-card,
+    .knowledge-card,
+    .agent-card,
+    .report-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: none;
+    }
+    .flow-card,
+    .knowledge-card,
+    .report-card {
+      padding: 14px;
+    }
+    .flow-card strong,
+    .knowledge-card strong,
+    .report-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+    .flow-card p,
+    .knowledge-card p,
+    .report-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .command-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .command-card {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .command-card span {
+      display: inline-flex;
+      width: fit-content;
+      height: 24px;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: #3730a3;
+      background: #eef2ff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .command-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    .command-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+    .command-card code {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .module-grid {
       display: grid;
@@ -304,6 +476,11 @@
     th:nth-child(3) { width: 116px; }
     th:nth-child(4) { width: 120px; }
     th:nth-child(6) { width: 220px; }
+    .compact-table th:nth-child(1) { width: 126px; }
+    .compact-table th:nth-child(2) { width: 110px; }
+    .compact-table th:nth-child(3) { width: 138px; }
+    .compact-table th:nth-child(4) { width: 140px; }
+    .compact-table th:nth-child(5) { width: auto; }
     tbody tr {
       cursor: pointer;
     }
@@ -415,6 +592,92 @@
       border-color: #818cf8;
       background: #e0e7ff;
     }
+    .agent-card {
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .agent-card h2,
+    .agent-card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+    .agent-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .agent-steps {
+      list-style: none;
+      margin: 12px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .agent-steps li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    .agent-steps li > span {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #3730a3;
+      background: #eef2ff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .agent-steps strong {
+      display: block;
+      font-size: 13px;
+    }
+    .agent-steps p {
+      margin-top: 2px;
+      font-size: 12px;
+    }
+    .agent-status {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .agent-status div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: var(--panel-soft);
+      font-size: 13px;
+    }
+    .agent-status span {
+      color: var(--muted);
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      min-width: 180px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: #fff;
+      background: #111827;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 20;
+    }
+    .toast.show {
+      opacity: 1;
+    }
     .detail-drawer {
       position: fixed;
       top: 18px;
@@ -473,12 +736,22 @@
     .hidden {
       display: none;
     }
-    @media (max-width: 1100px) {
+    @media (max-width: 1280px) {
       .app {
         grid-template-columns: 56px 240px minmax(0, 1fr);
       }
+      .agent-panel {
+        grid-column: 2 / 4;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
       .summary-grid {
         grid-template-columns: repeat(3, 1fr);
+      }
+      .command-list,
+      .workspace-grid,
+      .workspace-grid.three {
+        grid-template-columns: 1fr;
       }
       th:nth-child(2) { width: 138px; }
       th:nth-child(6) { width: 180px; }
@@ -510,6 +783,13 @@
       }
       .summary-grid {
         grid-template-columns: repeat(2, 1fr);
+      }
+      .panel-head {
+        display: block;
+      }
+      .panel-actions {
+        justify-content: flex-start;
+        margin-top: 10px;
       }
       .table-wrap {
         max-height: none;
@@ -543,7 +823,7 @@
 </head>
 <body>
   <div class="app">
-    
+
     <aside class="rail" aria-label="工作台功能栏">
       <button class="rail-item active" data-panel="cases" title="用例库">TC</button>
       <button class="rail-item" data-panel="runs" title="执行记录">RUN</button>
@@ -571,188 +851,194 @@
       </nav>
       <section class="nav-section">
         <h3>用例库</h3>
-        
+
     <button class="nav-item" data-filter-group="module" data-filter-value="公共导航" style="--accent:#2563eb">
       <span>COM</span>
       <strong>公共导航</strong>
       <em>16</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="News" style="--accent:#0891b2">
       <span>NEWS</span>
       <strong>News</strong>
       <em>25</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="Market" style="--accent:#16a34a">
       <span>MKT</span>
       <strong>Market</strong>
       <em>23</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="Events" style="--accent:#7c3aed">
       <span>EVT</span>
       <strong>Events</strong>
       <em>18</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="Event 深页" style="--accent:#dc2626">
       <span>EVTD</span>
       <strong>Event 深页</strong>
       <em>36</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="Analysis 深页" style="--accent:#9333ea">
       <span>ANL</span>
       <strong>Analysis 深页</strong>
       <em>17</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="Signal" style="--accent:#ea580c">
       <span>SIG</span>
       <strong>Signal</strong>
       <em>27</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="登录登出" style="--accent:#475569">
       <span>AUTH</span>
       <strong>登录登出</strong>
       <em>14</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="下单链路" style="--accent:#0f766e">
       <span>ORDER</span>
       <strong>下单链路</strong>
       <em>11</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="跨页链路" style="--accent:#4f46e5">
       <span>FLOW</span>
       <strong>跨页链路</strong>
       <em>24</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="module" data-filter-value="鲁棒性" style="--accent:#64748b">
       <span>ROB</span>
       <strong>鲁棒性</strong>
       <em>15</em>
     </button>
-  
+
       </section>
       <section class="nav-section">
         <h3>执行状态</h3>
-        
+
     <button class="nav-item" data-filter-group="status" data-filter-value="passed" style="">
       <span>PASS</span>
       <strong>已覆盖 / 通过</strong>
       <em>210</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="status" data-filter-value="review" style="">
       <span>WARN</span>
       <strong>待复核</strong>
       <em>15</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="status" data-filter-value="failed" style="">
       <span>FAIL</span>
       <strong>已知未通过</strong>
       <em>1</em>
     </button>
-  
+
       </section>
       <section class="nav-section">
         <h3>测试流程层级</h3>
-        
+
     <button class="nav-item" data-filter-group="framework" data-filter-value="F01" style="">
       <span>F01</span>
       <strong>F01 入口与导航</strong>
       <em>65</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F02" style="">
       <span>F02</span>
       <strong>F02 首屏结构</strong>
       <em>39</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F03" style="">
       <span>F03</span>
       <strong>F03 数据字段</strong>
       <em>43</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F04" style="">
       <span>F04</span>
       <strong>F04 搜索与筛选</strong>
       <em>31</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F05" style="">
       <span>F05</span>
       <strong>F05 卡片承接</strong>
       <em>15</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F06" style="">
       <span>F06</span>
       <strong>F06 页面内交互</strong>
       <em>10</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F07" style="">
       <span>F07</span>
       <strong>F07 交易前承接</strong>
       <em>4</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F08" style="">
       <span>F08</span>
       <strong>F08 登录与权限</strong>
       <em>11</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F09" style="">
       <span>F09</span>
       <strong>F09 返回与路由</strong>
       <em>3</em>
     </button>
-  
+
 
     <button class="nav-item" data-filter-group="framework" data-filter-value="F10" style="">
       <span>F10</span>
       <strong>F10 异常与鲁棒性</strong>
       <em>5</em>
     </button>
-  
+
       </section>
     </aside>
-  
+
     <main class="main">
       <header class="topbar">
         <div>
-          <h1>测试用例分类工作台</h1>
-          <p>来源：PredX_Pro_测试用例_V2_已覆盖版_2026-07-20.md。生成时间：2026/07/23 18:05:32</p>
+          <h1 id="workspaceTitle">PredX QA Agent 工作台</h1>
+          <p>面向日常回归的测试执行、缺陷归因、报告沉淀和 Agent 工作流框架。生成时间：2026/07/23 18:21:16</p>
+          <div class="stage-row" aria-label="项目阶段">
+            <span class="stage-pill">阶段 1 用例设计</span>
+            <span class="stage-pill">阶段 2 非登录态自动化</span>
+            <span class="stage-pill">阶段 3 条件式自动化</span>
+            <span class="stage-pill current">阶段 4 工作台框架</span>
+          </div>
         </div>
         <div class="top-actions">
           <input id="globalSearch" type="search" placeholder="全局搜索 TC / 步骤 / 预期 / 脚本">
@@ -765,61 +1051,72 @@
           </select>
         </div>
       </header>
-      
+      <section class="workspace-panel active" data-panel-content="cases">
+        <div class="panel-head">
+          <div>
+            <h2>用例库</h2>
+            <p>按模块、状态、流程层级查看已有覆盖。这里暂时不新增用例，只作为后续执行、缺陷和报告的统一索引。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="npm run workbench">复制生成命令</button>
+            <button class="primary-action" type="button" data-copy="npm run run:daily">复制日常回归</button>
+          </div>
+        </div>
+
     <section class="summary-grid">
-      
+
     <article class="metric-card">
       <span>总用例</span>
       <strong>226</strong>
       <em>当前已覆盖版用例池</em>
     </article>
-  
-      
+
+
     <article class="metric-card">
       <span>已覆盖</span>
       <strong>210</strong>
       <em>无未关闭阻断</em>
     </article>
-  
-      
+
+
     <article class="metric-card">
       <span>待复核</span>
       <strong>15</strong>
       <em>最近回归需复核</em>
     </article>
-  
-      
+
+
     <article class="metric-card">
       <span>未通过</span>
       <strong>1</strong>
       <em>已知未关闭缺陷</em>
     </article>
-  
-      
+
+
     <article class="metric-card">
       <span>直接自动化</span>
       <strong>158</strong>
       <em>日常主力覆盖</em>
     </article>
-  
-      
+
+
     <article class="metric-card">
       <span>条件式</span>
       <strong>58</strong>
       <em>依赖 fixture / 环境</em>
     </article>
-  
+
     </section>
-  
-      <section class="module-grid" aria-label="模块卡片">
-        
+
+        <section class="module-grid" aria-label="模块卡片">
+
         <button class="module-card" data-filter-group="module" data-filter-value="公共导航" style="--accent:#2563eb">
           <span>COM</span>
           <strong>公共导航</strong>
           <em>16/16 已覆盖</em>
           <small>无未关闭阻断</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="News" style="--accent:#0891b2">
           <span>NEWS</span>
@@ -827,7 +1124,7 @@
           <em>25/25 已覆盖</em>
           <small>无未关闭阻断</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="Market" style="--accent:#16a34a">
           <span>MKT</span>
@@ -835,7 +1132,7 @@
           <em>23/23 已覆盖</em>
           <small>无未关闭阻断</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="Events" style="--accent:#7c3aed">
           <span>EVT</span>
@@ -843,7 +1140,7 @@
           <em>18/18 已覆盖</em>
           <small>无未关闭阻断</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="Event 深页" style="--accent:#dc2626">
           <span>EVTD</span>
@@ -851,7 +1148,7 @@
           <em>33/36 已覆盖</em>
           <small>3 条需关注</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="Analysis 深页" style="--accent:#9333ea">
           <span>ANL</span>
@@ -859,7 +1156,7 @@
           <em>7/17 已覆盖</em>
           <small>10 条需关注</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="Signal" style="--accent:#ea580c">
           <span>SIG</span>
@@ -867,7 +1164,7 @@
           <em>26/27 已覆盖</em>
           <small>1 条需关注</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="登录登出" style="--accent:#475569">
           <span>AUTH</span>
@@ -875,7 +1172,7 @@
           <em>14/14 已覆盖</em>
           <small>无未关闭阻断</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="下单链路" style="--accent:#0f766e">
           <span>ORDER</span>
@@ -883,7 +1180,7 @@
           <em>11/11 已覆盖</em>
           <small>无未关闭阻断</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="跨页链路" style="--accent:#4f46e5">
           <span>FLOW</span>
@@ -891,7 +1188,7 @@
           <em>23/24 已覆盖</em>
           <small>1 条需关注</small>
         </button>
-      
+
 
         <button class="module-card" data-filter-group="module" data-filter-value="鲁棒性" style="--accent:#64748b">
           <span>ROB</span>
@@ -899,30 +1196,30 @@
           <em>14/15 已覆盖</em>
           <small>1 条需关注</small>
         </button>
-      
-      </section>
-      <section class="table-panel">
-        <div class="table-header">
-          <div>
-            <strong id="activeTitle">全部用例</strong>
-            <span id="activeHint">按左侧分类查看模块、状态和流程层级</span>
+
+        </section>
+        <section class="table-panel">
+          <div class="table-header">
+            <div>
+              <strong id="activeTitle">全部用例</strong>
+              <span id="activeHint">按左侧分类查看模块、状态和流程层级</span>
+            </div>
+            <span id="visibleCount">226 / 226</span>
           </div>
-          <span id="visibleCount">226 / 226</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>用例编号</th>
-                <th>模块 / 优先级</th>
-                <th>状态</th>
-                <th>层级</th>
-                <th>测试步骤 / 预期结果</th>
-                <th>命令 / 详情</th>
-              </tr>
-            </thead>
-            <tbody id="caseRows">
-              
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>用例编号</th>
+                  <th>模块 / 优先级</th>
+                  <th>状态</th>
+                  <th>层级</th>
+                  <th>测试步骤 / 预期结果</th>
+                  <th>命令 / 详情</th>
+                </tr>
+              </thead>
+              <tbody id="caseRows">
+
         <tr
           data-id="TC-COM-001"
           data-module="公共导航"
@@ -954,7 +1251,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-002"
@@ -987,7 +1284,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-003"
@@ -1020,7 +1317,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-004"
@@ -1053,7 +1350,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-005"
@@ -1086,7 +1383,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-006"
@@ -1119,7 +1416,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-007"
@@ -1152,7 +1449,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-008"
@@ -1185,7 +1482,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-009"
@@ -1218,7 +1515,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-010"
@@ -1251,7 +1548,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-011"
@@ -1284,7 +1581,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-012"
@@ -1317,7 +1614,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-013"
@@ -1350,7 +1647,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-014"
@@ -1383,7 +1680,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-015"
@@ -1416,7 +1713,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-COM-016"
@@ -1449,7 +1746,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-001"
@@ -1482,7 +1779,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-002"
@@ -1515,7 +1812,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-003"
@@ -1548,7 +1845,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-004"
@@ -1581,7 +1878,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-005"
@@ -1614,7 +1911,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-006"
@@ -1647,7 +1944,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-007"
@@ -1680,7 +1977,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-008"
@@ -1713,7 +2010,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-009"
@@ -1746,7 +2043,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-010"
@@ -1779,7 +2076,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-011"
@@ -1812,7 +2109,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-012"
@@ -1845,7 +2142,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-013"
@@ -1878,7 +2175,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-014"
@@ -1911,7 +2208,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-015"
@@ -1944,7 +2241,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-016"
@@ -1977,7 +2274,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-017"
@@ -2010,7 +2307,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-018"
@@ -2043,7 +2340,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-019"
@@ -2076,7 +2373,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-020"
@@ -2109,7 +2406,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-021"
@@ -2142,7 +2439,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-022"
@@ -2175,7 +2472,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-023"
@@ -2208,7 +2505,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-024"
@@ -2241,7 +2538,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-NEWS-025"
@@ -2274,7 +2571,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-001"
@@ -2307,7 +2604,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-002"
@@ -2340,7 +2637,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-003"
@@ -2373,7 +2670,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-004"
@@ -2406,7 +2703,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-005"
@@ -2439,7 +2736,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-006"
@@ -2472,7 +2769,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-007"
@@ -2505,7 +2802,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-008"
@@ -2538,7 +2835,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-009"
@@ -2571,7 +2868,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-010"
@@ -2604,7 +2901,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-011"
@@ -2637,7 +2934,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-012"
@@ -2670,7 +2967,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-013"
@@ -2703,7 +3000,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-014"
@@ -2736,7 +3033,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-015"
@@ -2769,7 +3066,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-016"
@@ -2802,7 +3099,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-017"
@@ -2835,7 +3132,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-018"
@@ -2868,7 +3165,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-019"
@@ -2901,7 +3198,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-020"
@@ -2934,7 +3231,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-021"
@@ -2967,7 +3264,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-022"
@@ -3000,7 +3297,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-MKT-023"
@@ -3033,7 +3330,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-001"
@@ -3066,7 +3363,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-002"
@@ -3099,7 +3396,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-003"
@@ -3132,7 +3429,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-004"
@@ -3165,7 +3462,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-005"
@@ -3198,7 +3495,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-006"
@@ -3231,7 +3528,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-007"
@@ -3264,7 +3561,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-008"
@@ -3297,7 +3594,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-009"
@@ -3330,7 +3627,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-010"
@@ -3363,7 +3660,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-011"
@@ -3396,7 +3693,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-012"
@@ -3429,7 +3726,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-013"
@@ -3462,7 +3759,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-014"
@@ -3495,7 +3792,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-015"
@@ -3528,7 +3825,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-016"
@@ -3561,7 +3858,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-017"
@@ -3594,7 +3891,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVT-018"
@@ -3627,7 +3924,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-001"
@@ -3660,7 +3957,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-002"
@@ -3693,7 +3990,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-003"
@@ -3726,7 +4023,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-004"
@@ -3759,7 +4056,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-005"
@@ -3792,7 +4089,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-006"
@@ -3825,7 +4122,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-007"
@@ -3858,7 +4155,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-008"
@@ -3891,7 +4188,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-009"
@@ -3924,7 +4221,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-010"
@@ -3957,7 +4254,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-011"
@@ -3990,7 +4287,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-012"
@@ -4023,7 +4320,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-013"
@@ -4056,7 +4353,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-014"
@@ -4089,7 +4386,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-015"
@@ -4122,7 +4419,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-016"
@@ -4155,7 +4452,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-017"
@@ -4188,7 +4485,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-018"
@@ -4221,7 +4518,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-019"
@@ -4254,7 +4551,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-020"
@@ -4287,7 +4584,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-021"
@@ -4320,7 +4617,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-022"
@@ -4353,7 +4650,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-023"
@@ -4386,7 +4683,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-024"
@@ -4419,7 +4716,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-025"
@@ -4452,7 +4749,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-026"
@@ -4485,7 +4782,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-027"
@@ -4518,7 +4815,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-028"
@@ -4551,7 +4848,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-029"
@@ -4584,7 +4881,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-030"
@@ -4617,7 +4914,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-031"
@@ -4650,7 +4947,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-032"
@@ -4683,7 +4980,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-033"
@@ -4716,7 +5013,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-034"
@@ -4749,7 +5046,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-035"
@@ -4782,7 +5079,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-EVTD-036"
@@ -4815,7 +5112,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-001"
@@ -4848,7 +5145,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-002"
@@ -4881,7 +5178,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-003"
@@ -4914,7 +5211,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-004"
@@ -4947,7 +5244,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-005"
@@ -4980,7 +5277,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-006"
@@ -5013,7 +5310,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-007"
@@ -5046,7 +5343,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-008"
@@ -5079,7 +5376,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-009"
@@ -5112,7 +5409,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-010"
@@ -5145,7 +5442,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-011"
@@ -5178,7 +5475,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-012"
@@ -5211,7 +5508,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-013"
@@ -5244,7 +5541,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-014"
@@ -5277,7 +5574,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-015"
@@ -5310,7 +5607,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-016"
@@ -5343,7 +5640,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ANL-017"
@@ -5376,7 +5673,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-001"
@@ -5409,7 +5706,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-002"
@@ -5442,7 +5739,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-003"
@@ -5475,7 +5772,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-004"
@@ -5508,7 +5805,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-005"
@@ -5541,7 +5838,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-006"
@@ -5574,7 +5871,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-007"
@@ -5607,7 +5904,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-008"
@@ -5640,7 +5937,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-009"
@@ -5673,7 +5970,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-010"
@@ -5706,7 +6003,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-011"
@@ -5739,7 +6036,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-012"
@@ -5772,7 +6069,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-013"
@@ -5805,7 +6102,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-014"
@@ -5838,7 +6135,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-015"
@@ -5871,7 +6168,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-016"
@@ -5904,7 +6201,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-017"
@@ -5937,7 +6234,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-018"
@@ -5970,7 +6267,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-019"
@@ -6003,7 +6300,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-020"
@@ -6036,7 +6333,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-021"
@@ -6069,7 +6366,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-022"
@@ -6102,7 +6399,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-023"
@@ -6135,7 +6432,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-024"
@@ -6168,7 +6465,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-025"
@@ -6201,7 +6498,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-026"
@@ -6234,7 +6531,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-SIG-027"
@@ -6267,7 +6564,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-001"
@@ -6300,7 +6597,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-002"
@@ -6333,7 +6630,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-003"
@@ -6366,7 +6663,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-004"
@@ -6399,7 +6696,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-005"
@@ -6432,7 +6729,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-006"
@@ -6465,7 +6762,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-007"
@@ -6498,7 +6795,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-008"
@@ -6531,7 +6828,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-010"
@@ -6564,7 +6861,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-011"
@@ -6597,7 +6894,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-012"
@@ -6630,7 +6927,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-013"
@@ -6663,7 +6960,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-014"
@@ -6696,7 +6993,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-AUTH-016"
@@ -6729,7 +7026,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-001"
@@ -6762,7 +7059,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-002"
@@ -6795,7 +7092,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-003"
@@ -6828,7 +7125,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-004"
@@ -6861,7 +7158,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-005"
@@ -6894,7 +7191,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-006"
@@ -6927,7 +7224,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-007"
@@ -6960,7 +7257,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-008"
@@ -6993,7 +7290,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-009"
@@ -7026,7 +7323,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-010"
@@ -7059,7 +7356,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ORDER-018"
@@ -7092,7 +7389,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-001"
@@ -7125,7 +7422,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-002"
@@ -7158,7 +7455,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-003"
@@ -7191,7 +7488,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-004"
@@ -7224,7 +7521,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-005"
@@ -7257,7 +7554,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-006"
@@ -7290,7 +7587,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-007"
@@ -7323,7 +7620,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-008"
@@ -7356,7 +7653,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-009"
@@ -7389,7 +7686,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-010"
@@ -7422,7 +7719,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-011"
@@ -7455,7 +7752,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-012"
@@ -7488,7 +7785,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-013"
@@ -7521,7 +7818,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-014"
@@ -7554,7 +7851,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-015"
@@ -7587,7 +7884,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-016"
@@ -7620,7 +7917,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-017"
@@ -7653,7 +7950,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-018"
@@ -7686,7 +7983,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-019"
@@ -7719,7 +8016,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-020"
@@ -7752,7 +8049,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-021"
@@ -7785,7 +8082,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-022"
@@ -7818,7 +8115,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-023"
@@ -7851,7 +8148,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-FLOW-024"
@@ -7884,7 +8181,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-001"
@@ -7917,7 +8214,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-002"
@@ -7950,7 +8247,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-003"
@@ -7983,7 +8280,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-004"
@@ -8016,7 +8313,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-005"
@@ -8049,7 +8346,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-006"
@@ -8082,7 +8379,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-007"
@@ -8115,7 +8412,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-008"
@@ -8148,7 +8445,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-009"
@@ -8181,7 +8478,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-010"
@@ -8214,7 +8511,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-011"
@@ -8247,7 +8544,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-012"
@@ -8280,7 +8577,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-013"
@@ -8313,7 +8610,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-014"
@@ -8346,7 +8643,7 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
+
 
         <tr
           data-id="TC-ROB-015"
@@ -8379,12 +8676,526 @@
             <button type="button" class="detail-button">详情</button>
           </td>
         </tr>
-      
-            </tbody>
-          </table>
+
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="runs">
+        <div class="panel-head">
+          <div>
+            <h2>执行中心</h2>
+            <p>先把“怎么跑、跑哪一类、需要什么条件”固定下来；后续再接入一键执行和历史记录。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="primary-action" type="button" data-copy="npm run run:daily">复制推荐命令</button>
+          </div>
         </div>
+        <section class="command-list">
+
+        <article class="command-card">
+          <div>
+            <span>推荐</span>
+            <strong>日常主回归</strong>
+            <p>游客态主链路、核心条件式自动化、失败证据和报告产物</p>
+          </div>
+          <code>npm run run:daily</code>
+          <button type="button" data-copy="npm run run:daily">复制命令</button>
+        </article>
+
+
+        <article class="command-card">
+          <div>
+            <span>稳定</span>
+            <strong>非登录态回归</strong>
+            <p>News、Market、Events、Signal、Analysis、跨页和鲁棒性</p>
+          </div>
+          <code>npm run test:guest</code>
+          <button type="button" data-copy="npm run test:guest">复制命令</button>
+        </article>
+
+
+        <article class="command-card">
+          <div>
+            <span>条件</span>
+            <strong>Market 条件式</strong>
+            <p>筛选 query、接口响应契约、TVL、24h volume、creation/end date</p>
+          </div>
+          <code>npm run test:conditional:market</code>
+          <button type="button" data-copy="npm run test:conditional:market">复制命令</button>
+        </article>
+
+
+        <article class="command-card">
+          <div>
+            <span>条件</span>
+            <strong>Event 条件式</strong>
+            <p>Event 深页图表、时间窗口、tooltip、数据恢复</p>
+          </div>
+          <code>npm run test:conditional:event</code>
+          <button type="button" data-copy="npm run test:conditional:event">复制命令</button>
+        </article>
+
+
+        <article class="command-card">
+          <div>
+            <span>专项</span>
+            <strong>搜索返回复核</strong>
+            <p>真实 Chrome headed 路径复核顶部搜索和浏览器返回</p>
+          </div>
+          <code>npm run test:flow:search:headed</code>
+          <button type="button" data-copy="npm run test:flow:search:headed">复制命令</button>
+        </article>
+
+
+        <article class="command-card">
+          <div>
+            <span>人工协助</span>
+            <strong>登录态专项</strong>
+            <p>需要 .auth/user.json；验证登录态保持、登出和权限承接</p>
+          </div>
+          <code>npm run test:conditional:auth-user</code>
+          <button type="button" data-copy="npm run test:conditional:auth-user">复制命令</button>
+        </article>
+
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="bugs">
+        <div class="panel-head">
+          <div>
+            <h2>缺陷分流</h2>
+            <p>这里展示当前未通过、待复核、条件待执行的用例候选；下一步会接入正式 bug 单编号和证据链接。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="npm run report">复制查看报告命令</button>
+          </div>
+        </div>
+        <section class="table-panel">
+          <div class="table-header">
+            <div>
+              <strong>待处理清单</strong>
+              <span>失败不能直接判产品 bug，必须先按证据归因</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="compact-table">
+              <thead>
+                <tr>
+                  <th>用例编号</th>
+                  <th>模块</th>
+                  <th>状态</th>
+                  <th>分流</th>
+                  <th>当前结论</th>
+                </tr>
+              </thead>
+              <tbody>
+
+        <tr>
+          <td><span class="case-id">TC-EVTD-005</span></td>
+          <td>Event 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归固定报价选择器过窄，线上价格变化后需改动态断言</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-EVTD-016</span></td>
+          <td>Event 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归 Max 快捷金额未观察到输入变化或受限提示</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-EVTD-032</span></td>
+          <td>Event 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归 Evidence Reload 空态分支与当前样本数据不一致</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-001</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归中 Analysis 当前样本页结构/Related News 断言待复核</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-003</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归中 Analysis 当前样本页结构/Related News 断言待复核</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-005</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归中 Analysis 当前样本页结构/Related News 断言待复核</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-006</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归中 Analysis 当前样本页结构/Related News 断言待复核</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-007</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归中 Analysis 当前样本页结构/Related News 断言待复核</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-010</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归未找到 Related News 承接入口，需按当前产品结构复核</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-011</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归未找到 Analysis -&gt; News 承接入口，需按当前产品结构复核</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-012</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归长页面滚动稳定性失败，疑似受样本页结构变化影响</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-013</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归右侧栏展示校验失败，需确认内容缺失还是断言过严</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ANL-017</span></td>
+          <td>Analysis 深页</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归语义一致性校验失败，需复核数据映射口径</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-SIG-023</span></td>
+          <td>Signal</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归 Signal 推荐价与关联市场价差超过阈值，需复核数据映射或脚本取值</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-FLOW-011</span></td>
+          <td>跨页链路</td>
+          <td><span class="status review">⚠️ 最近日常失败待复核</span></td>
+          <td>待复核</td>
+          <td>2026-07-17 日常回归 Analysis -&gt; News 承接链路未找到，与 Related News 结构变化相关</td>
+        </tr>
+
+
+        <tr>
+          <td><span class="case-id">TC-ROB-013</span></td>
+          <td>鲁棒性</td>
+          <td><span class="status failed">❌ 已知未通过</span></td>
+          <td>产品缺陷候选</td>
+          <td>已知缺陷：顶部 Sign In 获得焦点后按 Enter/Space 未打开登录弹层，键盘可访问性不达标</td>
+        </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="reports">
+        <div class="panel-head">
+          <div>
+            <h2>报告中心</h2>
+            <p>报告页先展示覆盖率口径和模块分布；后续可以接 latest-run.json，把最近一次执行结果自动回填进来。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="node scripts/generate-full-test-report.mjs">复制报告生成命令</button>
+          </div>
+        </div>
+        <section class="workspace-grid three">
+          <article class="report-card">
+            <strong>当前口径</strong>
+            <p>226 条工作台用例，210 条已覆盖且无未关闭阻断，15 条最近回归待复核，1 条已知未通过。</p>
+          </article>
+          <article class="report-card">
+            <strong>报告目标</strong>
+            <p>输出总览、执行结果表、失败原因、正式 bug 单、证据路径和下一轮动作。</p>
+          </article>
+          <article class="report-card">
+            <strong>日常使用</strong>
+            <p>先跑 npm run run:daily，再生成报告和工作台，最后只处理红叉和待复核项。</p>
+          </article>
+        </section>
+        <section class="table-panel" style="margin-top:14px">
+          <div class="table-header">
+            <div>
+              <strong>模块覆盖分布</strong>
+              <span>用于判断哪些模块需要优先补自动化或复核</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="compact-table">
+              <thead>
+                <tr>
+                  <th>模块</th>
+                  <th>已覆盖 / 总数</th>
+                  <th>覆盖率</th>
+                  <th>待复核</th>
+                  <th>未通过</th>
+                </tr>
+              </thead>
+              <tbody>
+
+        <tr>
+          <td>公共导航</td>
+          <td>16/16</td>
+          <td>100%</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>News</td>
+          <td>25/25</td>
+          <td>100%</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>Market</td>
+          <td>23/23</td>
+          <td>100%</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>Events</td>
+          <td>18/18</td>
+          <td>100%</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>Event 深页</td>
+          <td>33/36</td>
+          <td>92%</td>
+          <td>3</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>Analysis 深页</td>
+          <td>7/17</td>
+          <td>41%</td>
+          <td>10</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>Signal</td>
+          <td>26/27</td>
+          <td>96%</td>
+          <td>1</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>登录登出</td>
+          <td>14/14</td>
+          <td>100%</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>下单链路</td>
+          <td>11/11</td>
+          <td>100%</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>跨页链路</td>
+          <td>23/24</td>
+          <td>96%</td>
+          <td>1</td>
+          <td>0</td>
+        </tr>
+
+
+        <tr>
+          <td>鲁棒性</td>
+          <td>14/15</td>
+          <td>93%</td>
+          <td>0</td>
+          <td>1</td>
+        </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="knowledge">
+        <div class="panel-head">
+          <div>
+            <h2>知识库</h2>
+            <p>这里沉淀测试 Agent 的核心规则，避免之后每次都重新解释判断口径。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="codex-skills/predx-qa-agent/">复制 Agent 路径</button>
+          </div>
+        </div>
+        <section class="workspace-grid">
+
+        <article class="knowledge-card">
+          <strong>执行顺序</strong>
+          <p>PRD / 页面观察 -&gt; 用例编号 -&gt; 自动化脚本 -&gt; 执行证据 -&gt; 失败归因 -&gt; 报告回填</p>
+        </article>
+
+
+        <article class="knowledge-card">
+          <strong>失败归因</strong>
+          <p>先看截图、trace、console、network，再区分产品 bug、脚本问题、数据漂移、环境问题和人工项。</p>
+        </article>
+
+
+        <article class="knowledge-card">
+          <strong>安全边界</strong>
+          <p>默认不做真实下单、钱包签名、资金划转、第三方 OAuth 无监督登录。</p>
+        </article>
+
+
+        <article class="knowledge-card">
+          <strong>覆盖口径</strong>
+          <p>区分用例总数、脚本覆盖数、日常执行数、通过数、待复核数，避免把不同口径混在一起。</p>
+        </article>
+
+
+        <article class="knowledge-card">
+          <strong>Agent 规则</strong>
+          <p>核心规则位于 codex-skills/predx-qa-agent/，用于约束后续 AI 协助测试的工作流。</p>
+        </article>
+
+        </section>
       </section>
     </main>
+    <aside class="agent-panel" aria-label="Agent 工作流">
+      <section class="agent-card">
+        <h2>Agent 控制台</h2>
+        <p>当前先搭框架：把测试用例、执行命令、缺陷分流、报告和规则集中到一个工作台。</p>
+        <div class="agent-status">
+          <div><span>项目阶段</span><strong>工作台框架 V1</strong></div>
+          <div><span>用例索引</span><strong>226 条</strong></div>
+          <div><span>运行入口</span><strong>本地命令</strong></div>
+          <div><span>下一步</span><strong>接执行结果</strong></div>
+        </div>
+      </section>
+      <section class="agent-card">
+        <h3>核心工作流</h3>
+        <ul class="agent-steps">
+
+        <li>
+          <span>1</span>
+          <div>
+            <strong>选择工作区</strong>
+            <p>先判断当前目标是补脚本、跑回归、归因缺陷还是出报告。</p>
+          </div>
+        </li>
+
+
+        <li>
+          <span>2</span>
+          <div>
+            <strong>绑定用例编号</strong>
+            <p>所有动作都要能回到 TC 编号，避免只写散乱脚本。</p>
+          </div>
+        </li>
+
+
+        <li>
+          <span>3</span>
+          <div>
+            <strong>执行并留证据</strong>
+            <p>每次运行都保留命令、结果、截图、trace 或报告路径。</p>
+          </div>
+        </li>
+
+
+        <li>
+          <span>4</span>
+          <div>
+            <strong>归因失败</strong>
+            <p>失败先分类，脚本差异修复后直接回填通过。</p>
+          </div>
+        </li>
+
+
+        <li>
+          <span>5</span>
+          <div>
+            <strong>更新报告</strong>
+            <p>工作台、README、报告和 GitHub 保持一致。</p>
+          </div>
+        </li>
+
+        </ul>
+      </section>
+      <section class="agent-card">
+        <h3>下一阶段功能</h3>
+        <p>把 Playwright JSON 结果转成 latest-run.json，让 RUN、BUG、REP 三个页面显示真实最近一次执行数据。</p>
+      </section>
+    </aside>
   </div>
   <aside id="drawer" class="detail-drawer" aria-live="polite">
     <div class="drawer-head">
@@ -8402,6 +9213,8 @@
     };
     const rows = Array.from(document.querySelectorAll('#caseRows tr'));
     const buttons = Array.from(document.querySelectorAll('[data-filter-group]'));
+    const railButtons = Array.from(document.querySelectorAll('[data-panel]'));
+    const panels = Array.from(document.querySelectorAll('[data-panel-content]'));
     const globalSearch = document.getElementById('globalSearch');
     const sidebarSearch = document.getElementById('sidebarSearch');
     const priorityFilter = document.getElementById('priorityFilter');
@@ -8412,6 +9225,15 @@
     const drawerTitle = document.getElementById('drawerTitle');
     const drawerBody = document.getElementById('drawerBody');
     const drawerClose = document.getElementById('drawerClose');
+    const workspaceTitle = document.getElementById('workspaceTitle');
+
+    const panelTitles = {
+      cases: 'PredX QA Agent 工作台',
+      runs: '执行中心',
+      bugs: '缺陷分流',
+      reports: '报告中心',
+      knowledge: '知识库'
+    };
 
     function applyFilter() {
       let visible = 0;
@@ -8423,7 +9245,7 @@
           row.dataset[state.group] === state.value;
         const matchesPriority =
           state.priority === 'all' ||
-          row.children[2].textContent.trim() === state.priority;
+          row.dataset.priority === state.priority;
         const matchesQuery =
           !query ||
           row.dataset.search.includes(query);
@@ -8446,14 +9268,31 @@
       applyFilter();
     }
 
+    function setPanel(panelName) {
+      railButtons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.panel === panelName);
+      });
+      panels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.panelContent === panelName);
+      });
+      workspaceTitle.textContent = panelTitles[panelName] || 'PredX QA Agent 工作台';
+      drawer.classList.remove('open');
+    }
+
+    railButtons.forEach((button) => {
+      button.addEventListener('click', () => setPanel(button.dataset.panel));
+    });
+
     for (const button of buttons) {
       button.addEventListener('click', () => {
+        setPanel('cases');
         setFilter(button.dataset.filterGroup, button.dataset.filterValue, button.querySelector('strong')?.textContent || '全部用例');
       });
     }
 
     document.querySelectorAll('.module-card').forEach((card) => {
       card.addEventListener('click', () => {
+        setPanel('cases');
         setFilter(card.dataset.filterGroup, card.dataset.filterValue, card.querySelector('strong').textContent);
       });
     });
@@ -8495,6 +9334,36 @@
     });
 
     drawerClose.addEventListener('click', () => drawer.classList.remove('open'));
+
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const text = button.dataset.copy;
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast('已复制');
+        } catch {
+          const input = document.createElement('textarea');
+          input.value = text;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          input.remove();
+          showToast('已复制');
+        }
+      });
+    });
+
+    function showToast(message) {
+      let toast = document.querySelector('.toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 1400);
+    }
 
     function escapeHtml(value) {
       return String(value)

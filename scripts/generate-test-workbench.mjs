@@ -402,6 +402,156 @@ function buildModuleCards(cases) {
     .join('\n');
 }
 
+function buildRunCards() {
+  const commands = [
+    {
+      title: '日常主回归',
+      command: 'npm run run:daily',
+      scope: '游客态主链路、核心条件式自动化、失败证据和报告产物',
+      level: '推荐'
+    },
+    {
+      title: '非登录态回归',
+      command: 'npm run test:guest',
+      scope: 'News、Market、Events、Signal、Analysis、跨页和鲁棒性',
+      level: '稳定'
+    },
+    {
+      title: 'Market 条件式',
+      command: 'npm run test:conditional:market',
+      scope: '筛选 query、接口响应契约、TVL、24h volume、creation/end date',
+      level: '条件'
+    },
+    {
+      title: 'Event 条件式',
+      command: 'npm run test:conditional:event',
+      scope: 'Event 深页图表、时间窗口、tooltip、数据恢复',
+      level: '条件'
+    },
+    {
+      title: '搜索返回复核',
+      command: 'npm run test:flow:search:headed',
+      scope: '真实 Chrome headed 路径复核顶部搜索和浏览器返回',
+      level: '专项'
+    },
+    {
+      title: '登录态专项',
+      command: 'npm run test:conditional:auth-user',
+      scope: '需要 .auth/user.json；验证登录态保持、登出和权限承接',
+      level: '人工协助'
+    }
+  ];
+
+  return commands
+    .map(
+      (item) => `
+        <article class="command-card">
+          <div>
+            <span>${escapeHtml(item.level)}</span>
+            <strong>${escapeHtml(item.title)}</strong>
+            <p>${escapeHtml(item.scope)}</p>
+          </div>
+          <code>${escapeHtml(item.command)}</code>
+          <button type="button" data-copy="${escapeHtml(item.command)}">复制命令</button>
+        </article>
+      `
+    )
+    .join('\n');
+}
+
+function buildBugRows(cases) {
+  const riskRows = cases.filter((row) => statusKind(row.currentStatus) !== 'passed');
+  const rows = riskRows.length ? riskRows : cases.filter((row) => row.priority === 'P0' || row.priority === 'P1').slice(0, 8);
+
+  return rows
+    .slice(0, 18)
+    .map((row) => {
+      const kind = statusKind(row.currentStatus);
+      const owner =
+        kind === 'failed' ? '产品缺陷候选' :
+        kind === 'review' ? '待复核' :
+        kind === 'pending' ? '条件待执行' :
+        '观察项';
+      return `
+        <tr>
+          <td><span class="case-id">${escapeHtml(row.id)}</span></td>
+          <td>${escapeHtml(row.module)}</td>
+          <td><span class="status ${escapeHtml(kind)}">${escapeHtml(row.currentStatus)}</span></td>
+          <td>${escapeHtml(owner)}</td>
+          <td>${escapeHtml(row.note || row.expected)}</td>
+        </tr>
+      `;
+    })
+    .join('\n');
+}
+
+function buildReportRows(cases) {
+  return moduleOrder
+    .filter((name) => cases.some((row) => row.module === name))
+    .map((name) => {
+      const rows = cases.filter((row) => row.module === name);
+      const passed = rows.filter((row) => statusKind(row.currentStatus) === 'passed').length;
+      const review = rows.filter((row) => statusKind(row.currentStatus) === 'review').length;
+      const failed = rows.filter((row) => statusKind(row.currentStatus) === 'failed').length;
+      const rate = Math.round((passed / rows.length) * 100);
+      return `
+        <tr>
+          <td>${escapeHtml(name)}</td>
+          <td>${passed}/${rows.length}</td>
+          <td>${rate}%</td>
+          <td>${review}</td>
+          <td>${failed}</td>
+        </tr>
+      `;
+    })
+    .join('\n');
+}
+
+function buildKnowledgeCards() {
+  const items = [
+    ['执行顺序', 'PRD / 页面观察 -> 用例编号 -> 自动化脚本 -> 执行证据 -> 失败归因 -> 报告回填'],
+    ['失败归因', '先看截图、trace、console、network，再区分产品 bug、脚本问题、数据漂移、环境问题和人工项。'],
+    ['安全边界', '默认不做真实下单、钱包签名、资金划转、第三方 OAuth 无监督登录。'],
+    ['覆盖口径', '区分用例总数、脚本覆盖数、日常执行数、通过数、待复核数，避免把不同口径混在一起。'],
+    ['Agent 规则', '核心规则位于 codex-skills/predx-qa-agent/，用于约束后续 AI 协助测试的工作流。']
+  ];
+
+  return items
+    .map(
+      ([title, body]) => `
+        <article class="knowledge-card">
+          <strong>${escapeHtml(title)}</strong>
+          <p>${escapeHtml(body)}</p>
+        </article>
+      `
+    )
+    .join('\n');
+}
+
+function buildAgentSteps() {
+  const steps = [
+    ['1', '选择工作区', '先判断当前目标是补脚本、跑回归、归因缺陷还是出报告。'],
+    ['2', '绑定用例编号', '所有动作都要能回到 TC 编号，避免只写散乱脚本。'],
+    ['3', '执行并留证据', '每次运行都保留命令、结果、截图、trace 或报告路径。'],
+    ['4', '归因失败', '失败先分类，脚本差异修复后直接回填通过。'],
+    ['5', '更新报告', '工作台、README、报告和 GitHub 保持一致。']
+  ];
+
+  return steps
+    .map(
+      ([index, title, body]) => `
+        <li>
+          <span>${escapeHtml(index)}</span>
+          <div>
+            <strong>${escapeHtml(title)}</strong>
+            <p>${escapeHtml(body)}</p>
+          </div>
+        </li>
+      `
+    )
+    .join('\n');
+}
+
 function buildHtml(cases, mappings) {
   const generatedAt = new Intl.DateTimeFormat('zh-CN', {
     timeZone: 'Asia/Shanghai',
@@ -418,11 +568,12 @@ function buildHtml(cases, mappings) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PredX QA 测试用例工作台</title>
+  <title>PredX QA Agent 工作台</title>
   <style>
     :root {
       --bg: #f5f7fb;
       --panel: #ffffff;
+      --panel-soft: #f8fafc;
       --line: #e5e7eb;
       --text: #111827;
       --muted: #64748b;
@@ -432,6 +583,7 @@ function buildHtml(cases, mappings) {
       --success: #16a34a;
       --warning: #d97706;
       --radius: 8px;
+      --shadow: 0 14px 40px rgb(15 23 42 / 8%);
     }
     * { box-sizing: border-box; }
     body {
@@ -447,7 +599,7 @@ function buildHtml(cases, mappings) {
     .app {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: 64px 288px minmax(0, 1fr);
+      grid-template-columns: 64px 288px minmax(0, 1fr) 340px;
     }
     .rail {
       background: #0f172a;
@@ -467,6 +619,9 @@ function buildHtml(cases, mappings) {
       cursor: pointer;
       font-size: 11px;
       font-weight: 700;
+    }
+    .rail-item:first-child {
+      margin-top: 4px;
     }
     .rail-item:hover,
     .rail-item.active {
@@ -578,6 +733,12 @@ function buildHtml(cases, mappings) {
       padding: 22px 24px 36px;
       overflow: auto;
     }
+    .agent-panel {
+      border-left: 1px solid var(--line);
+      background: #fff;
+      padding: 18px 16px;
+      overflow: auto;
+    }
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -595,6 +756,29 @@ function buildHtml(cases, mappings) {
       color: var(--muted);
       font-size: 13px;
     }
+    .stage-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .stage-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #dbeafe;
+      border-radius: 999px;
+      color: #1d4ed8;
+      background: #eff6ff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .stage-pill.current {
+      color: #ffffff;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
     .top-actions {
       display: flex;
       gap: 8px;
@@ -608,6 +792,66 @@ function buildHtml(cases, mappings) {
       padding: 0 10px;
       background: #fff;
       outline: none;
+    }
+    .workspace-panel {
+      display: none;
+    }
+    .workspace-panel.active {
+      display: block;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+    .panel-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .primary-action,
+    .ghost-action,
+    .command-card button,
+    .agent-card button {
+      min-height: 36px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .primary-action {
+      color: #fff;
+      background: var(--brand);
+    }
+    .ghost-action,
+    .command-card button,
+    .agent-card button {
+      color: #334155;
+      border-color: var(--line);
+      background: #fff;
+    }
+    .primary-action:hover,
+    .ghost-action:hover,
+    .command-card button:hover,
+    .agent-card button:hover {
+      filter: brightness(0.98);
+      border-color: #c7d2fe;
     }
     .summary-grid {
       display: grid;
@@ -633,6 +877,84 @@ function buildHtml(cases, mappings) {
       margin: 4px 0;
       font-size: 26px;
       line-height: 1;
+    }
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+    .workspace-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .flow-card,
+    .command-card,
+    .knowledge-card,
+    .agent-card,
+    .report-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: none;
+    }
+    .flow-card,
+    .knowledge-card,
+    .report-card {
+      padding: 14px;
+    }
+    .flow-card strong,
+    .knowledge-card strong,
+    .report-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+    .flow-card p,
+    .knowledge-card p,
+    .report-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .command-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .command-card {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .command-card span {
+      display: inline-flex;
+      width: fit-content;
+      height: 24px;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: #3730a3;
+      background: #eef2ff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .command-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    .command-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+    .command-card code {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .module-grid {
       display: grid;
@@ -719,6 +1041,11 @@ function buildHtml(cases, mappings) {
     th:nth-child(3) { width: 116px; }
     th:nth-child(4) { width: 120px; }
     th:nth-child(6) { width: 220px; }
+    .compact-table th:nth-child(1) { width: 126px; }
+    .compact-table th:nth-child(2) { width: 110px; }
+    .compact-table th:nth-child(3) { width: 138px; }
+    .compact-table th:nth-child(4) { width: 140px; }
+    .compact-table th:nth-child(5) { width: auto; }
     tbody tr {
       cursor: pointer;
     }
@@ -830,6 +1157,92 @@ function buildHtml(cases, mappings) {
       border-color: #818cf8;
       background: #e0e7ff;
     }
+    .agent-card {
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .agent-card h2,
+    .agent-card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+    .agent-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .agent-steps {
+      list-style: none;
+      margin: 12px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .agent-steps li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    .agent-steps li > span {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #3730a3;
+      background: #eef2ff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .agent-steps strong {
+      display: block;
+      font-size: 13px;
+    }
+    .agent-steps p {
+      margin-top: 2px;
+      font-size: 12px;
+    }
+    .agent-status {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .agent-status div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: var(--panel-soft);
+      font-size: 13px;
+    }
+    .agent-status span {
+      color: var(--muted);
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      min-width: 180px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: #fff;
+      background: #111827;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 20;
+    }
+    .toast.show {
+      opacity: 1;
+    }
     .detail-drawer {
       position: fixed;
       top: 18px;
@@ -888,12 +1301,22 @@ function buildHtml(cases, mappings) {
     .hidden {
       display: none;
     }
-    @media (max-width: 1100px) {
+    @media (max-width: 1280px) {
       .app {
         grid-template-columns: 56px 240px minmax(0, 1fr);
       }
+      .agent-panel {
+        grid-column: 2 / 4;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
       .summary-grid {
         grid-template-columns: repeat(3, 1fr);
+      }
+      .command-list,
+      .workspace-grid,
+      .workspace-grid.three {
+        grid-template-columns: 1fr;
       }
       th:nth-child(2) { width: 138px; }
       th:nth-child(6) { width: 180px; }
@@ -925,6 +1348,13 @@ function buildHtml(cases, mappings) {
       }
       .summary-grid {
         grid-template-columns: repeat(2, 1fr);
+      }
+      .panel-head {
+        display: block;
+      }
+      .panel-actions {
+        justify-content: flex-start;
+        margin-top: 10px;
       }
       .table-wrap {
         max-height: none;
@@ -962,8 +1392,14 @@ function buildHtml(cases, mappings) {
     <main class="main">
       <header class="topbar">
         <div>
-          <h1>测试用例分类工作台</h1>
-          <p>来源：PredX_Pro_测试用例_V2_已覆盖版_2026-07-20.md。生成时间：${escapeHtml(generatedAt)}</p>
+          <h1 id="workspaceTitle">PredX QA Agent 工作台</h1>
+          <p>面向日常回归的测试执行、缺陷归因、报告沉淀和 Agent 工作流框架。生成时间：${escapeHtml(generatedAt)}</p>
+          <div class="stage-row" aria-label="项目阶段">
+            <span class="stage-pill">阶段 1 用例设计</span>
+            <span class="stage-pill">阶段 2 非登录态自动化</span>
+            <span class="stage-pill">阶段 3 条件式自动化</span>
+            <span class="stage-pill current">阶段 4 工作台框架</span>
+          </div>
         </div>
         <div class="top-actions">
           <input id="globalSearch" type="search" placeholder="全局搜索 TC / 步骤 / 预期 / 脚本">
@@ -976,37 +1412,183 @@ function buildHtml(cases, mappings) {
           </select>
         </div>
       </header>
-      ${buildSummary(cases)}
-      <section class="module-grid" aria-label="模块卡片">
-        ${buildModuleCards(cases)}
-      </section>
-      <section class="table-panel">
-        <div class="table-header">
+      <section class="workspace-panel active" data-panel-content="cases">
+        <div class="panel-head">
           <div>
-            <strong id="activeTitle">全部用例</strong>
-            <span id="activeHint">按左侧分类查看模块、状态和流程层级</span>
+            <h2>用例库</h2>
+            <p>按模块、状态、流程层级查看已有覆盖。这里暂时不新增用例，只作为后续执行、缺陷和报告的统一索引。</p>
           </div>
-          <span id="visibleCount">${cases.length} / ${cases.length}</span>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="npm run workbench">复制生成命令</button>
+            <button class="primary-action" type="button" data-copy="npm run run:daily">复制日常回归</button>
+          </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>用例编号</th>
-                <th>模块 / 优先级</th>
-                <th>状态</th>
-                <th>层级</th>
-                <th>测试步骤 / 预期结果</th>
-                <th>命令 / 详情</th>
-              </tr>
-            </thead>
-            <tbody id="caseRows">
-              ${buildRows(cases, mappings)}
-            </tbody>
-          </table>
+        ${buildSummary(cases)}
+        <section class="module-grid" aria-label="模块卡片">
+          ${buildModuleCards(cases)}
+        </section>
+        <section class="table-panel">
+          <div class="table-header">
+            <div>
+              <strong id="activeTitle">全部用例</strong>
+              <span id="activeHint">按左侧分类查看模块、状态和流程层级</span>
+            </div>
+            <span id="visibleCount">${cases.length} / ${cases.length}</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>用例编号</th>
+                  <th>模块 / 优先级</th>
+                  <th>状态</th>
+                  <th>层级</th>
+                  <th>测试步骤 / 预期结果</th>
+                  <th>命令 / 详情</th>
+                </tr>
+              </thead>
+              <tbody id="caseRows">
+                ${buildRows(cases, mappings)}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="runs">
+        <div class="panel-head">
+          <div>
+            <h2>执行中心</h2>
+            <p>先把“怎么跑、跑哪一类、需要什么条件”固定下来；后续再接入一键执行和历史记录。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="primary-action" type="button" data-copy="npm run run:daily">复制推荐命令</button>
+          </div>
         </div>
+        <section class="command-list">
+          ${buildRunCards()}
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="bugs">
+        <div class="panel-head">
+          <div>
+            <h2>缺陷分流</h2>
+            <p>这里展示当前未通过、待复核、条件待执行的用例候选；下一步会接入正式 bug 单编号和证据链接。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="npm run report">复制查看报告命令</button>
+          </div>
+        </div>
+        <section class="table-panel">
+          <div class="table-header">
+            <div>
+              <strong>待处理清单</strong>
+              <span>失败不能直接判产品 bug，必须先按证据归因</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="compact-table">
+              <thead>
+                <tr>
+                  <th>用例编号</th>
+                  <th>模块</th>
+                  <th>状态</th>
+                  <th>分流</th>
+                  <th>当前结论</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${buildBugRows(cases)}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="reports">
+        <div class="panel-head">
+          <div>
+            <h2>报告中心</h2>
+            <p>报告页先展示覆盖率口径和模块分布；后续可以接 latest-run.json，把最近一次执行结果自动回填进来。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="node scripts/generate-full-test-report.mjs">复制报告生成命令</button>
+          </div>
+        </div>
+        <section class="workspace-grid three">
+          <article class="report-card">
+            <strong>当前口径</strong>
+            <p>226 条工作台用例，210 条已覆盖且无未关闭阻断，15 条最近回归待复核，1 条已知未通过。</p>
+          </article>
+          <article class="report-card">
+            <strong>报告目标</strong>
+            <p>输出总览、执行结果表、失败原因、正式 bug 单、证据路径和下一轮动作。</p>
+          </article>
+          <article class="report-card">
+            <strong>日常使用</strong>
+            <p>先跑 npm run run:daily，再生成报告和工作台，最后只处理红叉和待复核项。</p>
+          </article>
+        </section>
+        <section class="table-panel" style="margin-top:14px">
+          <div class="table-header">
+            <div>
+              <strong>模块覆盖分布</strong>
+              <span>用于判断哪些模块需要优先补自动化或复核</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="compact-table">
+              <thead>
+                <tr>
+                  <th>模块</th>
+                  <th>已覆盖 / 总数</th>
+                  <th>覆盖率</th>
+                  <th>待复核</th>
+                  <th>未通过</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${buildReportRows(cases)}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="workspace-panel" data-panel-content="knowledge">
+        <div class="panel-head">
+          <div>
+            <h2>知识库</h2>
+            <p>这里沉淀测试 Agent 的核心规则，避免之后每次都重新解释判断口径。</p>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-action" type="button" data-copy="codex-skills/predx-qa-agent/">复制 Agent 路径</button>
+          </div>
+        </div>
+        <section class="workspace-grid">
+          ${buildKnowledgeCards()}
+        </section>
       </section>
     </main>
+    <aside class="agent-panel" aria-label="Agent 工作流">
+      <section class="agent-card">
+        <h2>Agent 控制台</h2>
+        <p>当前先搭框架：把测试用例、执行命令、缺陷分流、报告和规则集中到一个工作台。</p>
+        <div class="agent-status">
+          <div><span>项目阶段</span><strong>工作台框架 V1</strong></div>
+          <div><span>用例索引</span><strong>${cases.length} 条</strong></div>
+          <div><span>运行入口</span><strong>本地命令</strong></div>
+          <div><span>下一步</span><strong>接执行结果</strong></div>
+        </div>
+      </section>
+      <section class="agent-card">
+        <h3>核心工作流</h3>
+        <ul class="agent-steps">
+          ${buildAgentSteps()}
+        </ul>
+      </section>
+      <section class="agent-card">
+        <h3>下一阶段功能</h3>
+        <p>把 Playwright JSON 结果转成 latest-run.json，让 RUN、BUG、REP 三个页面显示真实最近一次执行数据。</p>
+      </section>
+    </aside>
   </div>
   <aside id="drawer" class="detail-drawer" aria-live="polite">
     <div class="drawer-head">
@@ -1024,6 +1606,8 @@ function buildHtml(cases, mappings) {
     };
     const rows = Array.from(document.querySelectorAll('#caseRows tr'));
     const buttons = Array.from(document.querySelectorAll('[data-filter-group]'));
+    const railButtons = Array.from(document.querySelectorAll('[data-panel]'));
+    const panels = Array.from(document.querySelectorAll('[data-panel-content]'));
     const globalSearch = document.getElementById('globalSearch');
     const sidebarSearch = document.getElementById('sidebarSearch');
     const priorityFilter = document.getElementById('priorityFilter');
@@ -1034,6 +1618,15 @@ function buildHtml(cases, mappings) {
     const drawerTitle = document.getElementById('drawerTitle');
     const drawerBody = document.getElementById('drawerBody');
     const drawerClose = document.getElementById('drawerClose');
+    const workspaceTitle = document.getElementById('workspaceTitle');
+
+    const panelTitles = {
+      cases: 'PredX QA Agent 工作台',
+      runs: '执行中心',
+      bugs: '缺陷分流',
+      reports: '报告中心',
+      knowledge: '知识库'
+    };
 
     function applyFilter() {
       let visible = 0;
@@ -1045,7 +1638,7 @@ function buildHtml(cases, mappings) {
           row.dataset[state.group] === state.value;
         const matchesPriority =
           state.priority === 'all' ||
-          row.children[2].textContent.trim() === state.priority;
+          row.dataset.priority === state.priority;
         const matchesQuery =
           !query ||
           row.dataset.search.includes(query);
@@ -1068,14 +1661,31 @@ function buildHtml(cases, mappings) {
       applyFilter();
     }
 
+    function setPanel(panelName) {
+      railButtons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.panel === panelName);
+      });
+      panels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.panelContent === panelName);
+      });
+      workspaceTitle.textContent = panelTitles[panelName] || 'PredX QA Agent 工作台';
+      drawer.classList.remove('open');
+    }
+
+    railButtons.forEach((button) => {
+      button.addEventListener('click', () => setPanel(button.dataset.panel));
+    });
+
     for (const button of buttons) {
       button.addEventListener('click', () => {
+        setPanel('cases');
         setFilter(button.dataset.filterGroup, button.dataset.filterValue, button.querySelector('strong')?.textContent || '全部用例');
       });
     }
 
     document.querySelectorAll('.module-card').forEach((card) => {
       card.addEventListener('click', () => {
+        setPanel('cases');
         setFilter(card.dataset.filterGroup, card.dataset.filterValue, card.querySelector('strong').textContent);
       });
     });
@@ -1118,6 +1728,36 @@ function buildHtml(cases, mappings) {
 
     drawerClose.addEventListener('click', () => drawer.classList.remove('open'));
 
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const text = button.dataset.copy;
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast('已复制');
+        } catch {
+          const input = document.createElement('textarea');
+          input.value = text;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          input.remove();
+          showToast('已复制');
+        }
+      });
+    });
+
+    function showToast(message) {
+      let toast = document.querySelector('.toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 1400);
+    }
+
     function escapeHtml(value) {
       return String(value)
         .replaceAll('&', '&amp;')
@@ -1145,6 +1785,6 @@ if (!cases.length) {
 }
 
 fs.mkdirSync(outputDir, { recursive: true });
-fs.writeFileSync(outputPath, buildHtml(cases, mappings));
+fs.writeFileSync(outputPath, buildHtml(cases, mappings).replace(/[ \t]+$/gm, ''));
 
 console.log(outputPath);

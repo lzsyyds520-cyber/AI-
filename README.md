@@ -19,7 +19,7 @@ PredX Pro 自动化测试项目，用 Playwright 对线上站点 `https://predx.
 | 阶段 2：非登录态自动化 | 已完成主体 | 游客态页面、搜索、筛选、卡片承接、返回路径、异常恢复等已进入 Playwright |
 | 阶段 3：条件式自动化 | 已完成核心部分 | Market 筛选、Event 图表、搜索返回、慢网、接口异常、订单安全前置等已落地；真实邮箱、钱包、真实交易仍保留条件式或人工口径 |
 | 阶段 4：测试 Agent 规则 | 已完成 V1 | 已生成 `predx-qa-agent` skill，规范执行顺序、失败归因、覆盖率口径、报告口径和安全边界 |
-| 阶段 5：测试工作台 UI | 已完成 V1 | 已生成 `workbench/test-cases.html`，左侧按模块、状态、F01-F10 流程层级分类，右侧展示用例列表和详情 |
+| 阶段 5：测试工作台 UI | 已完成 V1 | 已生成 `workbench/test-cases.html`，包含 `TC / RUN / BUG / REP / KB` 五个可切换工作区、左侧分类导航和右侧 Agent 控制台 |
 | 阶段 6：自动执行平台 | 未完成 | 当前工作台是静态页面，还没有在 UI 内直接触发 Playwright、保存历史趋势或管理后端任务 |
 
 ## 当前测试用例覆盖
@@ -162,11 +162,17 @@ workbench/test-cases.html
 
 ## 测试工作台
 
-`workbench/test-cases.html` 是当前的静态测试用例工作台。
+`workbench/test-cases.html` 是当前的静态测试 Agent 工作台。
 
 已支持：
 
 - 左侧功能栏：`TC / RUN / BUG / REP / KB`
+- `TC` 用例库：模块、状态、F01-F10 流程层级、搜索、优先级筛选和用例详情
+- `RUN` 执行中心：沉淀日常回归、非登录态回归、条件式自动化、登录态专项等常用命令
+- `BUG` 缺陷分流：集中展示未通过、待复核、条件待执行候选，并按归因口径处理
+- `REP` 报告中心：展示覆盖口径、模块分布和报告生成入口
+- `KB` 知识库：沉淀 Agent 核心规则、失败归因、安全边界和覆盖口径
+- 右侧 Agent 控制台：展示当前阶段、用例索引、运行入口、下一步动作和核心工作流
 - 用例库分类：公共导航、News、Market、Events、Event 深页、Analysis、Signal、登录登出、下单链路、跨页链路、鲁棒性
 - 执行状态分类：已覆盖、待复核、已知未通过、条件待执行
 - F01-F10 测试流程层级分类
@@ -177,7 +183,7 @@ workbench/test-cases.html
 当前限制：
 
 - 工作台是静态 HTML，不会直接启动 Playwright。
-- `RUN / BUG / REP / KB` 目前是信息架构入口，还未接后端执行记录。
+- `RUN / BUG / REP / KB` 已经具备前端框架，但还未接后端执行记录和历史趋势。
 - 测试结果仍由 Playwright、Markdown 报告和生成脚本更新后再刷新工作台。
 
 ## PredX QA Agent
@@ -238,6 +244,6 @@ Use $predx-qa-agent to add coverage for TC-NEWS-016 and update the workbench.
 
 1. 把测试用例源从 Markdown 升级成结构化数据，例如 `test-cases.json`。
 2. 让工作台读取执行结果，展示最近一次运行的通过、失败、跳过和证据路径。
-3. 补齐 `RUN / BUG / REP / KB` 四个面板。
+3. 为 `RUN / BUG / REP / KB` 接入 `latest-run.json`、缺陷清单、报告产物和历史趋势。
 4. 优化 Analysis 与 Event 深页的动态数据断言，降低误判。
 5. 为登录态和下单安全链路建立稳定测试 session 或测试环境支持。

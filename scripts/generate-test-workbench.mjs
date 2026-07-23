@@ -313,6 +313,7 @@ function buildRows(cases, mappings) {
       const scriptText = scripts.length ? scripts.map((item) => item.file).join(' / ') : '未映射到标题，需复核';
       const titleText = scripts.length ? scripts.map((item) => item.title).join(' / ') : '';
       const kind = statusKind(row.currentStatus);
+      const command = commandFor(row);
       return `
         <tr
           data-id="${escapeHtml(row.id)}"
@@ -320,17 +321,30 @@ function buildRows(cases, mappings) {
           data-status="${escapeHtml(kind)}"
           data-framework="${escapeHtml(row.framework.code)}"
           data-search="${escapeHtml(`${row.id} ${row.module} ${row.priority} ${row.automationLevel} ${row.steps} ${row.expected} ${row.note} ${scriptText}`.toLowerCase())}"
+          data-priority="${escapeHtml(row.priority)}"
+          data-automation="${escapeHtml(row.automationLevel)}"
+          data-steps="${escapeHtml(row.steps)}"
+          data-expected="${escapeHtml(row.expected)}"
+          data-command="${escapeHtml(command)}"
+          data-script="${escapeHtml(scriptText)}"
+          data-script-title="${escapeHtml(titleText)}"
+          data-note="${escapeHtml(row.note)}"
         >
           <td><span class="case-id">${escapeHtml(row.id)}</span></td>
-          <td><span class="module-pill" style="--accent:${escapeHtml(meta.accent)}">${escapeHtml(row.module)}</span></td>
-          <td>${escapeHtml(row.priority)}</td>
+          <td class="case-meta">
+            <span class="module-pill" style="--accent:${escapeHtml(meta.accent)}">${escapeHtml(row.module)}</span>
+            <span class="priority-pill">${escapeHtml(row.priority)}</span>
+          </td>
           <td><span class="status ${kind}">${escapeHtml(row.currentStatus)}</span></td>
-          <td>${escapeHtml(row.framework.code)} ${escapeHtml(row.framework.label)}</td>
-          <td class="scenario">${escapeHtml(row.steps)}</td>
-          <td class="expected">${escapeHtml(row.expected)}</td>
-          <td><code>${escapeHtml(commandFor(row))}</code></td>
-          <td class="script-cell" title="${escapeHtml(titleText)}">${escapeHtml(scriptText)}</td>
-          <td class="note">${escapeHtml(row.note)}</td>
+          <td><span class="framework-pill">${escapeHtml(row.framework.code)}</span><span class="framework-label">${escapeHtml(row.framework.label)}</span></td>
+          <td class="scenario">
+            <strong>${escapeHtml(row.steps)}</strong>
+            <span>${escapeHtml(row.expected)}</span>
+          </td>
+          <td class="row-actions">
+            <code>${escapeHtml(command)}</code>
+            <button type="button" class="detail-button">详情</button>
+          </td>
         </tr>
       `;
     })
@@ -675,13 +689,14 @@ function buildHtml(cases, mappings) {
       font-size: 13px;
     }
     .table-wrap {
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       max-height: calc(100vh - 390px);
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1460px;
+      table-layout: fixed;
     }
     th,
     td {
@@ -699,6 +714,11 @@ function buildHtml(cases, mappings) {
       text-align: left;
       font-weight: 700;
     }
+    th:nth-child(1) { width: 128px; }
+    th:nth-child(2) { width: 166px; }
+    th:nth-child(3) { width: 116px; }
+    th:nth-child(4) { width: 120px; }
+    th:nth-child(6) { width: 220px; }
     tbody tr {
       cursor: pointer;
     }
@@ -725,6 +745,29 @@ function buildHtml(cases, mappings) {
       font-weight: 700;
       white-space: nowrap;
     }
+    .case-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .priority-pill,
+    .framework-pill {
+      display: inline-block;
+      padding: 4px 7px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .framework-label {
+      display: block;
+      margin-top: 4px;
+      color: #334155;
+      line-height: 1.35;
+    }
     .status {
       display: inline-block;
       white-space: nowrap;
@@ -742,22 +785,57 @@ function buildHtml(cases, mappings) {
       font-size: 12px;
     }
     .scenario,
-    .expected,
     .note {
-      max-width: 320px;
       line-height: 1.5;
     }
-    .script-cell {
-      max-width: 240px;
-      color: #475569;
+    .scenario strong,
+    .scenario span {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
       line-height: 1.45;
+    }
+    .scenario strong {
+      -webkit-line-clamp: 2;
+      font-weight: 650;
+    }
+    .scenario span {
+      margin-top: 4px;
+      color: var(--muted);
+      -webkit-line-clamp: 1;
+    }
+    .row-actions {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .row-actions code {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .detail-button {
+      width: 64px;
+      height: 30px;
+      border: 1px solid #c7d2fe;
+      border-radius: 8px;
+      color: #3730a3;
+      background: #eef2ff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .detail-button:hover {
+      border-color: #818cf8;
+      background: #e0e7ff;
     }
     .detail-drawer {
       position: fixed;
+      top: 18px;
       right: 18px;
       bottom: 18px;
-      width: min(520px, calc(100vw - 40px));
-      max-height: 70vh;
+      width: min(560px, calc(100vw - 40px));
       overflow: auto;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -765,6 +843,7 @@ function buildHtml(cases, mappings) {
       background: #fff;
       padding: 18px;
       display: none;
+      z-index: 10;
     }
     .detail-drawer.open {
       display: block;
@@ -797,6 +876,7 @@ function buildHtml(cases, mappings) {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #f8fafc;
+      line-height: 1.55;
     }
     .drawer-grid span {
       display: block;
@@ -815,6 +895,8 @@ function buildHtml(cases, mappings) {
       .summary-grid {
         grid-template-columns: repeat(3, 1fr);
       }
+      th:nth-child(2) { width: 138px; }
+      th:nth-child(6) { width: 180px; }
     }
     @media (max-width: 760px) {
       .app {
@@ -843,6 +925,33 @@ function buildHtml(cases, mappings) {
       }
       .summary-grid {
         grid-template-columns: repeat(2, 1fr);
+      }
+      .table-wrap {
+        max-height: none;
+      }
+      table,
+      thead,
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+      }
+      thead {
+        display: none;
+      }
+      tbody tr {
+        padding: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      td {
+        border-bottom: 0;
+        padding: 6px 0;
+      }
+      .row-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
     }
   </style>
@@ -884,15 +993,11 @@ function buildHtml(cases, mappings) {
             <thead>
               <tr>
                 <th>用例编号</th>
-                <th>模块</th>
-                <th>优先级</th>
+                <th>模块 / 优先级</th>
                 <th>状态</th>
                 <th>层级</th>
-                <th>测试步骤</th>
-                <th>预期结果</th>
-                <th>推荐命令</th>
-                <th>脚本映射</th>
-                <th>备注</th>
+                <th>测试步骤 / 预期结果</th>
+                <th>命令 / 详情</th>
               </tr>
             </thead>
             <tbody id="caseRows">
@@ -992,9 +1097,21 @@ function buildHtml(cases, mappings) {
     rows.forEach((row) => {
       row.addEventListener('click', () => {
         drawerTitle.textContent = row.dataset.id;
-        const cells = Array.from(row.children).map((cell) => cell.textContent.trim());
-        const labels = ['用例编号', '模块', '优先级', '状态', '流程层级', '测试步骤', '预期结果', '推荐命令', '脚本映射', '备注'];
-        drawerBody.innerHTML = labels.map((label, index) => '<div><span>' + label + '</span>' + escapeHtml(cells[index]) + '</div>').join('');
+        const detailItems = [
+          ['用例编号', row.dataset.id],
+          ['模块', row.dataset.module],
+          ['优先级', row.dataset.priority],
+          ['自动化分级', row.dataset.automation],
+          ['状态', row.children[2].textContent.trim()],
+          ['流程层级', row.children[3].textContent.trim()],
+          ['测试步骤', row.dataset.steps],
+          ['预期结果', row.dataset.expected],
+          ['推荐命令', row.dataset.command],
+          ['脚本映射', row.dataset.script],
+          ['脚本标题', row.dataset.scriptTitle],
+          ['备注', row.dataset.note]
+        ];
+        drawerBody.innerHTML = detailItems.map(([label, value]) => '<div><span>' + label + '</span>' + escapeHtml(value || '-') + '</div>').join('');
         drawer.classList.add('open');
       });
     });

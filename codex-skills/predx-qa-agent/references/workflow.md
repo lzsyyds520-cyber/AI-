@@ -20,6 +20,19 @@ Start by classifying the request into one primary task:
 5. Attach stable evidence: Playwright result, screenshot, trace, API URL, or manual note.
 6. Update the report or case table.
 
+## Workbench UI Direction
+
+When building the left-side workbench UI, keep modules aligned to this operational model:
+
+- Cases: inventory, case detail, priority, automation status, latest result.
+- Collection: captured URLs, API requests, selectors, screenshots, manual notes.
+- Runs: daily runs, targeted runs, history, environment, command used.
+- Bugs: failed cases grouped by product bug, script issue, data drift, environment gap, manual-only.
+- Reports: summary dashboard, full table, exportable Markdown or HTML.
+- Knowledge: stable samples, field contracts, search/history rules, auth/order constraints.
+
+The UI should expose the current workflow state, not just decorate command output.
+
 ## Execution Order
 
 Prefer this order when the user asks to continue from easy to hard:

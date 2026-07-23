@@ -30,12 +30,22 @@ Map requests into these modules before acting:
 
 ## Default Workflow
 
-1. Inspect `README.md`, `package.json`, and the relevant `tests/`, `support/`, `fixtures/`, and `scripts/` files.
-2. Identify the requested scope: new coverage, daily run, failing case triage, report generation, or auth/order conditional flow.
-3. Choose the narrowest safe command or file edit that advances that scope.
-4. Run a targeted check before broad regression when changing scripts.
-5. Update reports or test-case documentation only after evidence is collected.
-6. Summarize with case IDs, pass/fail status, evidence path, and any blocker.
+1. Inspect `README.md`, `package.json`, the active test-case document, and the relevant `tests/`, `support/`, `fixtures/`, and `scripts/` files.
+2. Identify the requested scope: new coverage, daily run, failing case triage, report generation, auth/order conditional flow, or workbench UI work.
+3. Map scope to case IDs before editing scripts or running tests. Do not treat an unnumbered check as coverage until it is traceable to a case ID.
+4. Choose the narrowest safe command or file edit that advances that scope.
+5. Run a targeted check before broad regression when changing scripts.
+6. Classify failures with evidence before marking them as product bugs.
+7. Update reports or test-case documentation only after evidence is collected.
+8. Summarize with case IDs, pass/fail status, evidence path, classification, and any blocker.
+
+## Quality Gates
+
+- A test is counted as automated coverage only when it has a case ID, an executable script, a defined expected result, and a latest execution state.
+- A bug is counted as product bug only when the reproduction path is precise and at least one of these is true: headed automation confirms it, user/manual reproduction confirms it, or Playwright artifacts visibly show the deterministic failure.
+- A daily report must separate inventory count, scripted count, daily-run count, passed count, failed count, skipped count, and blocked count.
+- Any script change that alters selectors, waits, URLs, fixtures, auth state, or order behavior must run the narrowest related test before report updates.
+- Search, browser back/forward, auth state, and order entry are high-risk flows; keep their reproduction path explicit.
 
 ## Command Map
 
@@ -62,35 +72,4 @@ Map requests into these modules before acting:
 - Read `references/workflow.md` for execution and update sequence.
 - Read `references/failure-triage.md` before marking any failed case as a product bug.
 - Read `references/reporting.md` before generating daily reports or coverage tables.
-
-**Examples from other skills:**
-- PDF skill: `fill_fillable_fields.py`, `extract_form_field_info.py` - utilities for PDF manipulation
-- DOCX skill: `document.py`, `utilities.py` - Python modules for document processing
-
-**Appropriate for:** Python scripts, shell scripts, or any executable code that performs automation, data processing, or specific operations.
-
-**Note:** Scripts may be executed without loading into context, but can still be read by Codex for patching or environment adjustments.
-
-### references/
-Documentation and reference material intended to be loaded into context to inform Codex's process and thinking.
-
-**Examples from other skills:**
-- Product management: `communication.md`, `context_building.md` - detailed workflow guides
-- BigQuery: API reference documentation and query examples
-- Finance: Schema documentation, company policies
-
-**Appropriate for:** In-depth documentation, API references, database schemas, comprehensive guides, or any detailed information that Codex should reference while working.
-
-### assets/
-Files not intended to be loaded into context, but rather used within the output Codex produces.
-
-**Examples from other skills:**
-- Brand styling: PowerPoint template files (.pptx), logo files
-- Frontend builder: HTML/React boilerplate project directories
-- Typography: Font files (.ttf, .woff2)
-
-**Appropriate for:** Templates, boilerplate code, document templates, images, icons, fonts, or any files meant to be copied or used in the final output.
-
----
-
-**Not every skill requires all three types of resources.**
+- Read `references/coverage-governance.md` before adding, removing, or recounting coverage.

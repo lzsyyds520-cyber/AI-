@@ -32,6 +32,7 @@
     "test:user": "playwright test tests/auth/auth-user.spec.ts --project=chromium --workers=1",
     "test:user:wallet": "AUTH_AUTOMATION_READY=true STORAGE_STATE=.auth/wallet-user.json playwright test tests/auth/auth-user.spec.ts --project=chromium --workers=1",
     "diagnose:prod": "node scripts/diagnose-production-behaviors.mjs",
+    "workbench": "node scripts/generate-test-workbench.mjs",
     "report": "playwright show-report"
   },
   "devDependencies": {

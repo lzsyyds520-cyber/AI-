@@ -73,3 +73,4 @@ Map requests into these modules before acting:
 - Read `references/failure-triage.md` before marking any failed case as a product bug.
 - Read `references/reporting.md` before generating daily reports or coverage tables.
 - Read `references/coverage-governance.md` before adding, removing, or recounting coverage.
+- Read `references/usage.md` when the user asks how to use the Agent or how previous workflows connect to the Agent.

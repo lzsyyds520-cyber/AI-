@@ -30,6 +30,7 @@ npm run test:guest
 npm run test:conditional
 npm run test:daily
 npm run run:daily
+npm run workbench
 ```
 
 ### 第二批条件式自动化
@@ -52,6 +53,7 @@ support/   公共环境变量、路径和通用方法
 tests/     按页面域与链路域拆分的测试脚本
 codex-skills/predx-qa-agent/
            PredX 自动化测试 Agent skill 草案
+workbench/ 左侧分类测试用例工作台 HTML
 ```
 
 ## GitHub 同步注意

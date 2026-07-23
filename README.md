@@ -1,6 +1,6 @@
 # PredX UI QA
 
-Playwright 自动化骨架，默认只跑游客态和安全链路。
+PredX 测试项目。Playwright 自动化骨架，默认只跑游客态和安全链路。
 
 ## 目标
 

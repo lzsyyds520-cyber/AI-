@@ -1,0 +1,7 @@
+interface:
+  display_name: "PredX QA Agent"
+  short_description: "PredX 自动化测试工作台 Agent"
+  default_prompt: "Use $predx-qa-agent to run PredX daily regression, triage failures, and update the QA report."
+
+policy:
+  allow_implicit_invocation: true

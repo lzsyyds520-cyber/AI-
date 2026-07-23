@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment and authentication state
+.env
+.env.*
+!.env.example
+.auth/
+storageState.json
+*.storageState.json
+
+# Playwright output
+test-results/
+playwright-report/
+blob-report/
+artifacts/
+*.webm
+*.zip
+test-failed-*.png
+tmp-*.png
+tmp-*.jpg
+
+# Local system and editor files
+.DS_Store
+*.log
+.vscode/
+.idea/

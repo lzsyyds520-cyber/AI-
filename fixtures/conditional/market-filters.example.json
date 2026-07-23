@@ -1,0 +1,118 @@
+{
+  "cases": [
+    {
+      "id": "TC-MKT-006",
+      "enabled": true,
+      "filterLabel": "Status",
+      "optionLabel": "Resolved",
+      "expectedRequest": {
+        "param": "event_status",
+        "value": "resolved"
+      },
+      "minItems": 1,
+      "assertions": [
+        {
+          "scope": "event",
+          "field": "closed",
+          "operator": "eq",
+          "value": 1
+        }
+      ],
+      "notes": "这是一个可运行的状态筛选示例。已去掉对固定标题排序的依赖，避免线上排序波动造成误报。"
+    },
+    {
+      "id": "TC-MKT-007",
+      "enabled": true,
+      "filterLabel": "End Date",
+      "optionLabel": "Last 7 Days",
+      "expectedRequest": {
+        "includes": [
+          {
+            "param": "end_date_start"
+          },
+          {
+            "param": "end_date_end"
+          }
+        ]
+      },
+      "minItems": 1,
+      "assertions": [
+        {
+          "scope": "event",
+          "field": "end_date",
+          "operator": "within_last_days",
+          "value": 7
+        }
+      ],
+      "notes": "线上已确认 Last 7 Days 使用 end_date_start + end_date_end 动态时间范围，断言 event.end_date 落在过去 7 天内。"
+    },
+    {
+      "id": "TC-MKT-008",
+      "enabled": true,
+      "filterLabel": "Liquidity (TVL)",
+      "optionLabel": "≥ $100k",
+      "expectedRequest": {
+        "param": "liquidity_min",
+        "value": "100000"
+      },
+      "minItems": 1,
+      "assertions": [
+        {
+          "scope": "event",
+          "field": "liquidity",
+          "operator": "gte",
+          "value": 100000
+        }
+      ],
+      "notes": "线上已确认筛选参数为 liquidity_min。接口返回事件列表中存在 markets[].liquidity_usdc=0 但 event 仍被返回，因此优先按 event.liquidity >= threshold 断言。"
+    },
+    {
+      "id": "TC-MKT-009",
+      "enabled": true,
+      "filterLabel": "Volume 24h",
+      "optionLabel": "≥ $50k",
+      "expectedRequest": {
+        "param": "volume_24hr_min",
+        "value": "50000"
+      },
+      "minItems": 1,
+      "assertions": [
+        {
+          "scope": "event",
+          "field": "volume_24hr",
+          "operator": "gte",
+          "value": 50000
+        }
+      ],
+      "notes": "线上已确认筛选参数为 volume_24hr_min。接口返回事件列表中存在 markets[].volume_24h=0 但 event 仍被返回，因此优先按 event.volume_24hr >= threshold 断言。"
+    },
+    {
+      "id": "TC-MKT-010",
+      "enabled": true,
+      "filterLabel": "Creation Time",
+      "optionLabel": "Last 7 Days",
+      "expectedRequest": {
+        "includes": [
+          {
+            "param": "creation_date_start"
+          },
+          {
+            "param": "creation_date_end"
+          }
+        ]
+      },
+      "minItems": 1,
+      "assertions": [
+        {
+          "scope": "market",
+          "quantifier": "any",
+          "field": "created_at",
+          "operator": "within_request_range",
+          "requestStartParam": "creation_date_start",
+          "requestEndParam": "creation_date_end"
+        }
+      ],
+      "notes": "线上已确认 Last 7 Days 使用 creation_date_start + creation_date_end 动态时间范围。event 无 created_at 字段，因此按 markets[].created_at 是否落在实际请求区间内断言，且每个 event 至少一个 market 命中条件。"
+    }
+  ]
+}

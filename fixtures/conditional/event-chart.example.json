@@ -1,0 +1,49 @@
+{
+  "path": "/event/world-cup-winner",
+  "chartMinWidth": 200,
+  "chartMinHeight": 150,
+  "ranges": [
+    {
+      "label": "1H",
+      "requestIncludes": [
+        "interval=1h",
+        "fidelity=1"
+      ]
+    },
+    {
+      "label": "1D",
+      "requestIncludes": [
+        "interval=1d",
+        "fidelity=5"
+      ]
+    },
+    {
+      "label": "1W",
+      "requestIncludes": [
+        "interval=1w",
+        "fidelity=30"
+      ]
+    },
+    {
+      "label": "1M",
+      "requestIncludes": [
+        "interval=1m",
+        "fidelity=180"
+      ]
+    },
+    {
+      "label": "3M",
+      "requestIncludes": [
+        "interval=1m",
+        "fidelity=360"
+      ]
+    },
+    {
+      "label": "ALL",
+      "requestIncludes": [
+        "interval=all",
+        "fidelity=720"
+      ]
+    }
+  ]
+}

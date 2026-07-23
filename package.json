@@ -1,0 +1,42 @@
+{
+  "name": "predx-ui-qa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:smoke": "playwright test tests/smoke",
+    "test:guest": "playwright test tests/smoke tests/news tests/market tests/events tests/event-detail tests/analysis tests/signal tests/auth/auth-guest.spec.ts tests/flows tests/rob",
+    "test:daily": "CONDITIONAL_AUTOMATION_READY=true MARKET_FILTER_AUTOMATION_READY=true MARKET_FILTER_FIXTURE=fixtures/conditional/market-filters.example.json EVENT_CHART_AUTOMATION_READY=true playwright test tests/smoke tests/news tests/market tests/events tests/event-detail tests/analysis tests/signal tests/auth/auth-guest.spec.ts tests/flows tests/rob tests/market/market-conditional.spec.ts tests/event-detail/event-detail-conditional.spec.ts --project=chromium --workers=1",
+    "test:conditional": "playwright test tests/market/market-conditional.spec.ts tests/event-detail/event-detail-conditional.spec.ts --workers=1",
+    "test:conditional:market": "playwright test tests/market/market-conditional.spec.ts --workers=1",
+    "test:conditional:event": "playwright test tests/event-detail/event-detail-conditional.spec.ts --workers=1",
+    "test:conditional:flow": "HEADED_GLOBAL_SEARCH_READY=true PW_CHANNEL=chrome playwright test tests/flows/flows.spec.ts --project=chromium --workers=1 --grep 'TC-FLOW-005' --headed",
+    "test:conditional:auth-user": "AUTH_AUTOMATION_READY=true playwright test tests/auth/auth-user.spec.ts --project=chromium --workers=1",
+    "test:conditional:order-user": "AUTH_AUTOMATION_READY=true playwright test tests/order/order-user-safe.spec.ts --project=chromium --workers=1",
+    "test:conditional:auth-real-profile": "AUTH_AUTOMATION_READY=true AUTH_REAL_PROFILE_READY=true AUTH_USER_DATA_DIR=.auth/real-chrome-email-profile playwright test tests/auth/auth-real-profile.spec.ts --project=chromium --workers=1 --headed",
+    "test:conditional:order-real-profile": "AUTH_AUTOMATION_READY=true AUTH_REAL_PROFILE_READY=true AUTH_USER_DATA_DIR=.auth/real-chrome-email-profile playwright test tests/order/order-real-profile-safe.spec.ts --project=chromium --workers=1 --headed",
+    "test:conditional:auth-real-chrome-profile15": "AUTH_AUTOMATION_READY=true AUTH_REAL_PROFILE_READY=true AUTH_REAL_PROFILE_CDP=true AUTH_USER_DATA_DIR=\"$HOME/Library/Application Support/Google/Chrome\" AUTH_PROFILE_DIRECTORY=\"Profile 15\" playwright test tests/auth/auth-real-profile.spec.ts --project=chromium --workers=1 --headed",
+    "test:conditional:order-real-chrome-profile15": "AUTH_AUTOMATION_READY=true AUTH_REAL_PROFILE_READY=true AUTH_REAL_PROFILE_CDP=true AUTH_USER_DATA_DIR=\"$HOME/Library/Application Support/Google/Chrome\" AUTH_PROFILE_DIRECTORY=\"Profile 15\" playwright test tests/order/order-real-profile-safe.spec.ts --project=chromium --workers=1 --headed",
+    "test:conditional:auth-profile15-copy": "AUTH_AUTOMATION_READY=true AUTH_REAL_PROFILE_READY=true AUTH_USE_SYSTEM_KEYCHAIN=true AUTH_USER_DATA_DIR=.auth/lzsyyds-profile-15-copy playwright test tests/auth/auth-real-profile.spec.ts --project=chromium --workers=1 --headed",
+    "test:conditional:order-profile15-copy": "AUTH_AUTOMATION_READY=true AUTH_REAL_PROFILE_READY=true AUTH_USE_SYSTEM_KEYCHAIN=true AUTH_USER_DATA_DIR=.auth/lzsyyds-profile-15-copy playwright test tests/order/order-real-profile-safe.spec.ts --project=chromium --workers=1 --headed",
+    "test:flow:search:headed": "HEADED_GLOBAL_SEARCH_READY=true PW_CHANNEL=chrome playwright test tests/flows/flows.spec.ts --project=chromium --workers=1 --grep 'TC-FLOW-005' --headed",
+    "run:daily": "zsh scripts/run-daily-regression.sh",
+    "auth:setup": "playwright test tests/auth/auth-google.setup.spec.ts --project=chromium --headed --workers=1",
+    "auth:setup:manual": "MANUAL_AUTH_ASSIST=true playwright test tests/auth/auth-google.setup.spec.ts --project=chromium --headed --workers=1",
+    "auth:setup:email": "playwright test tests/auth/auth-email.setup.spec.ts --project=chromium --headed --workers=1",
+    "auth:setup:email:manual": "TEST_USER_EMAIL=${TEST_USER_EMAIL:?set TEST_USER_EMAIL} AUTH_USER_DATA_DIR=${AUTH_USER_DATA_DIR:-.auth/real-chrome-email-profile} node scripts/auth-email-manual.mjs",
+    "auth:profile": "zsh scripts/open-real-chrome-profile.sh .auth/real-chrome-profile https://predx.pro/news",
+    "auth:setup:wallet": "WALLET_AUTH_ASSIST=true AUTH_BROWSER_CHANNEL=chrome AUTH_USER_DATA_DIR=.auth/real-chrome-profile WALLET_STORAGE_STATE=.auth/wallet-user.json playwright test tests/auth/auth-wallet.setup.spec.ts --project=chromium --headed --workers=1",
+    "test:user": "playwright test tests/auth/auth-user.spec.ts --project=chromium --workers=1",
+    "test:user:wallet": "AUTH_AUTOMATION_READY=true STORAGE_STATE=.auth/wallet-user.json playwright test tests/auth/auth-user.spec.ts --project=chromium --workers=1",
+    "diagnose:prod": "node scripts/diagnose-production-behaviors.mjs",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.6.3"
+  }
+}
